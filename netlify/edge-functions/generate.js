@@ -100,9 +100,9 @@ async function askGemini({ grammar, vocab, words, level }, key) {
     gemini: `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`,
     vertex: `https://aiplatform.googleapis.com/v1/publishers/google/models/${m}:generateContent`
   };
-  // Classic Gemini API keys start with "AIza". Keys that start with "AQ." can belong to Vertex AI (express mode),
-  // so for those we try Vertex AI first and fall back to the Gemini API (and the other way round).
-  const order = key.startsWith('AQ.') ? ['vertex', 'gemini'] : ['gemini', 'vertex'];
+  // The free Gemini API (Google AI Studio keys, "AIza…" or the newer "AQ.…") goes first.
+  // Vertex AI is only a fallback for keys that belong to Google Cloud.
+  const order = ['gemini', 'vertex'];
   const payload = {
     systemInstruction: { parts: [{ text: SYSTEM }] },
     contents: [{ role: 'user', parts: [{ text: prompt }] }],
@@ -110,6 +110,7 @@ async function askGemini({ grammar, vocab, words, level }, key) {
   };
 
   let res = null, data = null;
+  const tried = [];
   for (const name of order) {
     try {
       res = await fetch(endpoints[name], {
@@ -122,12 +123,13 @@ async function askGemini({ grammar, vocab, words, level }, key) {
     if (res.ok) { console.log('Gemini answered via', name); break; }
     const msg = data?.error?.message || '';
     console.log('Gemini error via', name, res.status, msg);
-    const keyProblem = [400, 401, 403].includes(res.status) && /api key|credential|unauthenticated|not supported|permission/i.test(msg);
-    if (!keyProblem) break;
+    tried.push(`${name === 'vertex' ? 'Vertex AI' : 'Gemini API'}: ${msg}`);
+    // Key, permission, billing or model problems on one endpoint: try the other one.
+    if (![400, 401, 403, 404].includes(res.status)) break;
   }
   if (!res) return { error: 'Could not reach Gemini. Try again in a moment.' };
   if (!res.ok) {
-    const detail = data?.error?.message || '';
+    const detail = tried.length > 1 ? tried.join(' | ') : (data?.error?.message || '');
     console.log('Gemini error', res.status, detail);
     if (res.status === 429) return { error: 'The free Gemini quota is used up for now. Wait a minute and try again.', detail };
     if ([400, 401, 403, 404].includes(res.status)) return { error: 'Gemini rejected the request. Check GEMINI_API_KEY and GEMINI_MODEL in Netlify.', detail };
