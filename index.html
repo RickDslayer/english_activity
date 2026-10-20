@@ -458,10 +458,12 @@ h1 .to{display:inline-block;background:var(--accent);color:var(--on-accent);padd
 
 <script>
 /* =====================================================================
-   CONFIG: paste here the URL of your Cloudflare Worker (see README.md).
-   The Gemini API key lives ONLY in the Worker, never in this file.
+   CONFIG: address of the AI server.
+   On Netlify the Edge Function answers at /api/generate on the same site (see README.md).
+   To use the Cloudflare Worker instead, put its full URL here.
+   The Gemini API key lives ONLY on the server, never in this file.
    ===================================================================== */
-const API_URL = 'https://english-activity.rjvargasg12.workers.dev/';
+const API_URL = '/api/generate';
 
 const $ = (s, el = document) => el.querySelector(s);
 const shuffle = arr => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
@@ -1099,7 +1101,8 @@ async function generate(e) {
   try {
     const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: ctrl.signal });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.error || `The AI server answered with error ${res.status}.`);
+    if (res.status === 404) throw new Error('The AI server was not found. Open this page from its Netlify address.');
+    if (!res.ok || data.error) throw new Error(data.error || `The AI server answered with error ${res.status}.`);
     const content = normalizeContent(data.content);
     const meta = { grammar, vocab };
     saveContent({ meta, content });

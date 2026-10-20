@@ -1,0 +1,5 @@
+# Netlify: the page is served from the repo root and the AI lives in an Edge Function.
+# The Gemini API key is NOT here: add GEMINI_API_KEY in Netlify → Site configuration → Environment variables.
+[build]
+  publish = "."
+  edge_functions = "netlify/edge-functions"
