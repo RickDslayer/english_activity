@@ -1,0 +1,1101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Would Like, Ask &amp; Tell</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap">
+<style>
+/* Layout: a home screen of four activity cards; each card opens one game on its own screen with a back button */
+:root{
+  --bg:#F2F4F9; --surface:#FFFFFF; --sunk:#E7EBF4; --ink:#1A2142; --muted:#596185; --line:#D5DBEA;
+  --accent:#F0A81C; --accent-soft:#FCEBC4; --on-accent:#1A2142;
+  --blue:#2E47CC; --blue-soft:#DFE4FB; --on-blue:#FFFFFF;
+  --good:#17804F; --good-soft:#D6F2E3; --bad:#C3303B; --bad-soft:#F9DCDE;
+  --f-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1328; --surface:#181E3B; --sunk:#222A52; --ink:#E8EBF8; --muted:#A1A9CF; --line:#2E3768;
+    --accent:#F4B53A; --accent-soft:#3D3215; --on-accent:#1A2142;
+    --blue:#93A5FF; --blue-soft:#232E66; --on-blue:#0F1328;
+    --good:#4FCB8D; --good-soft:#123B29; --bad:#FF7C86; --bad-soft:#47181D;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1328; --surface:#181E3B; --sunk:#222A52; --ink:#E8EBF8; --muted:#A1A9CF; --line:#2E3768;
+  --accent:#F4B53A; --accent-soft:#3D3215; --on-accent:#1A2142;
+  --blue:#93A5FF; --blue-soft:#232E66; --on-blue:#0F1328;
+  --good:#4FCB8D; --good-soft:#123B29; --bad:#FF7C86; --bad-soft:#47181D;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55}
+.wrap{max-width:1000px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);line-height:1.1;text-wrap:balance;margin:0}
+p{margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+
+/* Home */
+.home{padding-block:44px 64px;display:grid;gap:28px}
+.eyebrow{font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.hero{display:grid;gap:12px}
+h1{font-size:clamp(2.2rem,6vw,3.5rem);font-weight:800;letter-spacing:-.02em}
+h1 .to{display:inline-block;background:var(--accent);color:var(--on-accent);padding:0 .25em;border-radius:8px;transform:rotate(-3deg);margin-left:.1em}
+.lede{color:var(--muted);font-size:1.08rem;max-width:60ch}
+.home-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.gcard{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:center;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:18px;cursor:pointer;transition:border-color .15s,transform .15s}
+.gcard:hover{border-color:var(--blue);transform:translateY(-3px)}
+.gicon{width:96px;height:96px;border-radius:16px;display:grid;place-items:center;background:var(--accent-soft)}
+.gcard:nth-child(even) .gicon{background:var(--blue-soft)}
+.gicon svg{width:64px;height:64px}
+.gicon svg *{stroke:var(--ink);stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.gicon svg .solid{fill:var(--ink);stroke:none}
+.gtext{display:grid;gap:4px;min-width:0}
+.gtext h2{font-size:1.45rem;font-weight:800}
+.gtext p{color:var(--muted);font-size:.95rem}
+.gtext .go{color:var(--blue);font-weight:700;margin-top:4px}
+
+/* Game screen */
+.game{padding-block:20px 64px;display:grid;gap:22px}
+.gbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.panel{display:grid;gap:22px}
+.panel-head{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:end;justify-content:space-between}
+.panel-head > div{display:grid;gap:6px;min-width:0;max-width:64ch}
+.panel-head h2{font-size:2rem;font-weight:800}
+.panel-head p{color:var(--muted)}
+.score{font-weight:700;font-variant-numeric:tabular-nums;background:var(--surface);border:1px solid var(--line);padding:6px 12px;border-radius:999px;font-size:.9rem;white-space:nowrap}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.row.center{justify-content:center}
+.btn{background:var(--blue);color:var(--on-blue);border:2px solid var(--blue);padding:9px 18px;border-radius:999px;font-weight:700;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--blue)}
+.btn:disabled{opacity:.45;cursor:not-allowed;filter:none}
+.msg{min-height:1.6em;font-weight:700}
+.msg.ok{color:var(--good)} .msg.no{color:var(--bad)}
+.pill{display:inline-block;justify-self:start;font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:var(--accent-soft);color:var(--ink)}
+.pill.alt{background:var(--blue-soft)}
+.seg{display:inline-flex;flex-wrap:wrap;justify-self:start;gap:4px;padding:4px;background:var(--sunk);border-radius:999px}
+.seg-btn{border:0;background:none;padding:7px 16px;border-radius:999px;font-weight:700;cursor:pointer;color:var(--muted)}
+.seg-btn[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.18)}
+
+/* Setup (topic picker) */
+.setup{padding-block:44px 64px;display:grid;gap:28px}
+.setup-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px;display:grid;gap:20px;max-width:720px}
+.field{display:grid;gap:6px;min-width:0}
+.field label{font-weight:700}
+.field label span{font-weight:400;color:var(--muted)}
+.field input,.field textarea,.field select{font:inherit;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--blue);outline:none}
+.field textarea{resize:vertical;min-height:84px}
+.field-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.help-text{font-size:.88rem;color:var(--muted)}
+.ideas{display:flex;flex-wrap:wrap;gap:6px}
+.idea{border:1px solid var(--line);background:var(--sunk);border-radius:999px;padding:4px 12px;font-size:.88rem;cursor:pointer}
+.idea:hover{border-color:var(--blue);color:var(--blue)}
+.loading{display:flex;align-items:center;gap:10px;color:var(--muted);font-weight:700}
+.spinner{width:20px;height:20px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--blue);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.topic-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 16px}
+.topic-bar strong{font-family:var(--f-display);font-size:1.1rem;min-width:0;overflow-wrap:anywhere}
+.topic-bar .btn{margin-left:auto}
+@media (max-width:760px){ .field-row{grid-template-columns:1fr} }
+
+/* Hangman */
+.hm{display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr);gap:28px;align-items:start}
+.hm-fig{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:8px;justify-items:center}
+.hm-fig svg{width:100%;max-width:220px;height:auto}
+.hm-fig svg *{stroke:var(--ink);stroke-width:5;stroke-linecap:round;fill:none}
+.hm-fig .part{opacity:0;transition:opacity .25s}
+.hm-fig .part.on{opacity:1;stroke:var(--bad)}
+.lives{font-weight:700;font-variant-numeric:tabular-nums;color:var(--muted)}
+.hm-play{display:grid;gap:16px;min-width:0}
+.hm-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.hm-count{font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.hm-topic{font-weight:700;font-size:1rem}
+.hm-topic span{color:var(--muted);font-weight:400}
+.hm-sentence{font-family:var(--f-display);font-size:clamp(1.2rem,3vw,1.55rem);font-weight:500;line-height:1.35}
+.hm-sentence mark{background:var(--accent-soft);color:var(--ink);padding:0 .2em;border-radius:6px;font-weight:700}
+.hm-word{display:flex;flex-wrap:wrap;gap:8px}
+.tile{width:42px;height:50px;display:grid;place-items:center;border-bottom:4px solid var(--ink);font-family:var(--f-display);font-size:1.6rem;font-weight:800;background:var(--surface);border-radius:8px 8px 2px 2px}
+.tile.space{width:18px;border:0;background:none}
+.tile.missed{color:var(--bad)}
+.keys{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px}
+.key{height:44px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-weight:700;cursor:pointer}
+.key:hover:not(:disabled){border-color:var(--blue);color:var(--blue)}
+.key:disabled{cursor:default}
+.key.hit{background:var(--good-soft);color:var(--good);border-color:var(--good)}
+.key.miss{background:var(--sunk);color:var(--muted);text-decoration:line-through}
+.hint-text{color:var(--muted);font-style:italic}
+
+/* Matching */
+.match{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.col-label{font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-family:var(--f-body);font-weight:700;margin-bottom:10px}
+.mlist{display:grid;gap:10px}
+.mcard{position:relative;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:12px 14px;cursor:pointer;line-height:1.4;transition:border-color .15s,background .15s}
+.mcard:hover{border-color:var(--blue)}
+.mcard.sel{border-color:var(--blue);background:var(--blue-soft)}
+.mcard.wrong{border-color:var(--bad);background:var(--bad-soft);animation:shake .35s}
+.mcard.done{border-color:var(--good);background:var(--good-soft);cursor:default;padding-right:64px}
+.mcard .pair{position:absolute;right:10px;top:10px;font-size:.72rem;font-weight:700;color:var(--good);letter-spacing:.06em;text-transform:uppercase}
+.mcard[data-side="l"]{font-style:italic}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+/* Fill & drag */
+.fd-top{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.fd-count{font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.bank{display:flex;flex-wrap:wrap;gap:10px;padding:14px;background:var(--sunk);border:2px dashed var(--line);border-radius:var(--r)}
+.bank.locked{opacity:.5;pointer-events:none}
+.chip{background:var(--accent);color:var(--on-accent);border:0;border-radius:8px;padding:6px 12px;font-weight:700;cursor:grab;touch-action:manipulation;box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.fd-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px;display:grid;gap:12px}
+.fd-pre{color:var(--muted);font-style:italic}
+.fd-sent{font-family:var(--f-display);font-size:clamp(1.15rem,3vw,1.45rem);font-weight:500;line-height:2.3}
+.blank{display:inline-flex;align-items:center;justify-content:center;min-width:100px;min-height:40px;vertical-align:middle;border-bottom:3px solid var(--muted);background:var(--sunk);border-radius:8px 8px 2px 2px;padding:2px 10px;margin:0 3px;cursor:pointer;font-weight:700;line-height:1.3}
+.blank.target,.blank.over{border-color:var(--blue);background:var(--blue-soft)}
+.blank.filled{background:var(--accent-soft)}
+.blank-in{font:inherit;font-weight:700;width:8.5em;max-width:40vw;text-align:center;color:var(--ink);background:var(--sunk);border:0;border-bottom:3px solid var(--muted);border-radius:8px 8px 2px 2px;padding:2px 6px;margin:0 3px;vertical-align:middle;line-height:1.5}
+.blank-in:focus{border-color:var(--blue);background:var(--blue-soft);outline:none}
+.blank.ok,.blank-in.ok{border-color:var(--good);background:var(--good-soft);color:var(--good)}
+.blank.no,.blank-in.no{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
+.solution{color:var(--ink);font-weight:400}
+.solution strong{color:var(--good)}
+.fd-end{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:32px;display:grid;gap:14px;justify-items:start}
+.fd-end h3{font-size:1.7rem}
+
+/* Question cards */
+.deck{display:grid;gap:18px;max-width:620px;width:100%;margin:0 auto}
+.card{display:grid;perspective:1200px;cursor:pointer;border-radius:16px}
+.card-inner{display:grid;transition:transform .5s cubic-bezier(.3,.7,.3,1);transform-style:preserve-3d}
+.card.flipped .card-inner{transform:rotateY(180deg)}
+.face{grid-area:1/1;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:16px;padding:28px;min-height:270px;display:grid;gap:16px;border:1px solid var(--line)}
+.cover{background:var(--surface);justify-items:center;align-content:center;text-align:center;background-image:radial-gradient(var(--line) 1.2px,transparent 1.2px);background-size:18px 18px}
+.cover-icon{width:110px;height:110px;border-radius:50%;background:var(--accent-soft);display:grid;place-items:center}
+.cover-icon svg{width:64px;height:64px}
+.cover-icon svg *{stroke:var(--ink);stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.cover-icon svg .solid{fill:var(--ink);stroke:none}
+.cover .flip-hint{font-size:.9rem;color:var(--muted);background:var(--surface);padding:0 8px}
+.qface{background:var(--blue);color:var(--on-blue);transform:rotateY(180deg);border-color:var(--blue);align-content:space-between}
+.qface .pill{background:rgba(255,255,255,.2);color:var(--on-blue)}
+.q{font-family:var(--f-display);font-size:clamp(1.3rem,3.4vw,1.75rem);font-weight:700;line-height:1.3}
+.deck-nav{display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:700;font-variant-numeric:tabular-nums}
+.help{border-radius:var(--r);padding:16px 18px;display:grid;gap:10px;border:1px solid var(--line);background:var(--surface)}
+.help h3{font-size:1rem;letter-spacing:.08em;text-transform:uppercase;font-family:var(--f-body)}
+.help.hint{border-left:6px solid var(--accent)}
+.help.answer{border-left:6px solid var(--good)}
+.help .lbl{display:block;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.help .formula-line{font-family:var(--f-display);font-weight:700;font-size:1.1rem}
+.help .words{display:flex;flex-wrap:wrap;gap:6px}
+.help .words span{background:var(--sunk);border-radius:6px;padding:2px 8px;font-size:.92rem}
+.help .note{color:var(--muted);font-size:.9rem}
+.sugg{font-family:var(--f-display);font-size:1.2rem;font-weight:500}
+
+@media (max-width:760px){
+  .home-grid{grid-template-columns:1fr}
+  .gicon{width:76px;height:76px}
+  .gicon svg{width:50px;height:50px}
+  .hm{grid-template-columns:1fr}
+  .hm-fig{max-width:240px;justify-self:center;width:100%}
+  .match{grid-template-columns:1fr}
+  .tile{width:32px;height:42px;font-size:1.25rem}
+  .tile.space{width:12px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+}
+</style>
+</head>
+<body>
+
+<!-- SETUP: choose the topic before the games -->
+<section class="setup wrap" id="setup" hidden>
+  <div class="hero">
+    <p class="eyebrow">English grammar practice · Verb + to-infinitive</p>
+    <h1>Would like, ask &amp; tell <span class="to">+ to</span></h1>
+    <p class="lede">Choose a topic and the vocabulary you want to practise. The AI will build all four activities around them.</p>
+  </div>
+  <form class="setup-card" id="setup-form" novalidate>
+    <div class="field">
+      <label for="st-topic">Topic</label>
+      <input id="st-topic" type="text" maxlength="80" autocomplete="off" placeholder="e.g. Cybersecurity at work">
+      <div class="ideas" aria-label="Topic ideas">
+        <button type="button" class="idea">Travel and hotels</button>
+        <button type="button" class="idea">Restaurants</button>
+        <button type="button" class="idea">Cybersecurity at work</button>
+        <button type="button" class="idea">Software teams</button>
+        <button type="button" class="idea">Health and the doctor</button>
+        <button type="button" class="idea">Shopping</button>
+      </div>
+    </div>
+    <div class="field">
+      <label for="st-vocab">Vocabulary to include <span>(optional)</span></label>
+      <textarea id="st-vocab" maxlength="600" placeholder="firewall, password, backup, server, deploy"></textarea>
+      <p class="help-text">Separate the words with commas. If you leave it empty, the AI chooses useful words for the topic.</p>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label for="st-level">Level</label>
+        <select id="st-level">
+          <option value="A2">A2 · Elementary</option>
+          <option value="B1" selected>B1 · Intermediate</option>
+          <option value="B2">B2 · Upper intermediate</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="st-focus">Grammar focus</label>
+        <select id="st-focus">
+          <option value="mixed" selected>Positive and negative (to / not to)</option>
+          <option value="positive">Positive only (to)</option>
+          <option value="negative">Mostly negative (not to)</option>
+        </select>
+      </div>
+    </div>
+    <div class="loading" id="st-loading" hidden><span class="spinner" aria-hidden="true"></span>Creating your activities. This usually takes 15–40 seconds.</div>
+    <p class="msg no" id="st-msg" role="status"></p>
+    <div class="row">
+      <button class="btn" type="submit" id="st-go">Generate activities</button>
+      <button class="btn ghost" type="button" id="st-default">Use the default activities</button>
+    </div>
+  </form>
+</section>
+
+<!-- HOME -->
+<section class="home wrap" id="home" hidden>
+  <div class="hero">
+    <p class="eyebrow">English grammar practice · Verb + to-infinitive</p>
+    <h1>Would like, ask &amp; tell <span class="to">+ to</span></h1>
+    <p class="lede">Choose an activity to start practising.</p>
+  </div>
+  <div class="topic-bar">
+    <span class="pill" id="topic-kind">Default activities</span>
+    <strong id="topic-name">Everyday and IT English</strong>
+    <button class="btn ghost" type="button" id="change-topic">Change topic</button>
+  </div>
+  <div class="home-grid">
+    <button class="gcard" type="button" data-open="hangman">
+      <span class="gicon"><svg viewBox="0 0 64 64" aria-hidden="true">
+        <path d="M8 58 H34 M16 58 V6 H44 V14"/>
+        <circle cx="44" cy="20" r="6"/>
+        <path d="M44 26 V42 M44 30 L36 37 M44 30 L52 37 M44 42 L37 53 M44 42 L51 53"/>
+      </svg></span>
+      <span class="gtext"><h2>Hangman</h2><p>Guess the word letter by letter. Some words fill a gap, others come with a topic and a clue.</p><span class="go">Play →</span></span>
+    </button>
+    <button class="gcard" type="button" data-open="matching">
+      <span class="gicon"><svg viewBox="0 0 64 64" aria-hidden="true">
+        <rect x="4" y="8" width="20" height="14" rx="3"/><rect x="4" y="42" width="20" height="14" rx="3"/>
+        <rect x="40" y="8" width="20" height="14" rx="3"/><rect x="40" y="42" width="20" height="14" rx="3"/>
+        <path d="M24 15 L40 49 M24 49 L40 15"/>
+      </svg></span>
+      <span class="gtext"><h2>Match the Ideas</h2><p>Connect what someone said with the same idea written with an infinitive.</p><span class="go">Play →</span></span>
+    </button>
+    <button class="gcard" type="button" data-open="fill">
+      <span class="gicon"><svg viewBox="0 0 64 64" aria-hidden="true">
+        <path d="M6 20 H18 M46 20 H58"/>
+        <rect x="22" y="13" width="20" height="14" rx="3" stroke-dasharray="4 3"/>
+        <rect x="26" y="40" width="20" height="14" rx="3"/>
+        <path d="M32 38 V31 M28 34 L32 30 L36 34"/>
+      </svg></span>
+      <span class="gtext"><h2>Fill &amp; Drag</h2><p>Complete sentences with two missing words. Sometimes you drag, sometimes you write.</p><span class="go">Play →</span></span>
+    </button>
+    <button class="gcard" type="button" data-open="cards">
+      <span class="gicon"><svg viewBox="0 0 64 64" aria-hidden="true">
+        <rect x="8" y="12" width="32" height="44" rx="5" transform="rotate(-10 24 34)"/>
+        <rect x="22" y="8" width="32" height="44" rx="5"/>
+        <path d="M33 23 a5 5 0 1 1 7 5 c-2 1 -2 2 -2 5"/>
+        <circle class="solid" cx="38" cy="40" r="2.2"/>
+      </svg></span>
+      <span class="gtext"><h2>Question Cards</h2><p>Flip a card, answer the question, and use hints or a suggested answer if you need them.</p><span class="go">Play →</span></span>
+    </button>
+  </div>
+</section>
+
+<!-- GAME SCREEN -->
+<section class="game wrap" id="game" hidden>
+  <div class="gbar">
+    <button class="btn ghost" type="button" id="back">← All activities</button>
+    <span class="eyebrow">would like · ask · tell + to</span>
+  </div>
+
+  <!-- Hangman -->
+  <div id="hangman" class="panel" hidden>
+    <div class="panel-head">
+      <div><h2>Hangman</h2><p>Some words complete a sentence. Others come with a topic and a clue. You can make 6 mistakes, and you can type on your keyboard.</p></div>
+      <span class="score" id="hm-score">Won 0 of 0</span>
+    </div>
+    <div class="hm">
+      <figure class="hm-fig">
+        <svg viewBox="0 0 200 220" aria-hidden="true">
+          <path d="M20 208 H130 M55 208 V14 H140 V40"/>
+          <circle class="part" cx="140" cy="58" r="18"/>
+          <path class="part" d="M140 76 V132"/>
+          <path class="part" d="M140 92 L114 116"/>
+          <path class="part" d="M140 92 L166 116"/>
+          <path class="part" d="M140 132 L118 172"/>
+          <path class="part" d="M140 132 L162 172"/>
+        </svg>
+        <p class="lives" id="hm-lives">6 lives left</p>
+      </figure>
+      <div class="hm-play">
+        <div class="hm-meta"><span class="hm-count" id="hm-count">Word 1</span><span class="pill" id="hm-mode">Fill the gap</span></div>
+        <p class="hm-topic" id="hm-topic" hidden></p>
+        <p class="hm-sentence" id="hm-sentence"></p>
+        <div class="hm-word" id="hm-word" aria-live="polite"></div>
+        <div class="keys" id="hm-keys"></div>
+        <p class="hint-text" id="hm-hint-text" hidden></p>
+        <p class="msg" id="hm-msg" role="status"></p>
+        <div class="row">
+          <button class="btn" id="hm-next" type="button">Skip word</button>
+          <button class="btn ghost" id="hm-hint" type="button">Show hint</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Matching -->
+  <div id="matching" class="panel" hidden>
+    <div class="panel-head">
+      <div><h2>Match the Ideas</h2><p>On the left is what someone said. On the right is the same idea written with an infinitive. Tap one card on each side to make a pair.</p></div>
+      <span class="score" id="mt-score">0 of 8 matched</span>
+    </div>
+    <div class="seg" role="group" aria-label="Choose a set of sentences">
+      <button type="button" class="seg-btn" data-set="everyday" aria-pressed="true">Everyday English</button>
+      <button type="button" class="seg-btn" data-set="it" aria-pressed="false">IT English: negatives</button>
+      <button type="button" class="seg-btn" data-set="custom" aria-pressed="false" id="seg-custom" hidden>Your topic</button>
+    </div>
+    <div class="match">
+      <div><h3 class="col-label">What they said</h3><div class="mlist" id="mt-left"></div></div>
+      <div><h3 class="col-label">The same idea, with an infinitive</h3><div class="mlist" id="mt-right"></div></div>
+    </div>
+    <p class="msg ok" id="mt-msg" role="status"></p>
+    <div class="row"><button class="btn ghost" id="mt-reset" type="button">Shuffle and start again</button></div>
+  </div>
+
+  <!-- Fill & drag -->
+  <div id="fill" class="panel" hidden>
+    <div class="panel-head">
+      <div><h2>Fill &amp; Drag</h2><p>Each round picks 11 sentences from the bank, each with two missing words. You don't know if the next one is for dragging or for writing until it appears.</p></div>
+      <span class="score" id="fd-score">0 correct · 0 skipped</span>
+    </div>
+    <div id="fd-stage" class="panel">
+      <div class="fd-top"><span class="fd-count" id="fd-count">Sentence 1 of 11</span><span class="pill" id="fd-mode">Drag the words</span></div>
+      <p class="hint-text" id="fd-how"></p>
+      <div class="bank" id="fd-bank" aria-label="Word bank"></div>
+      <div class="fd-card">
+        <p class="fd-pre" id="fd-pre"></p>
+        <p class="fd-sent" id="fd-sent"></p>
+      </div>
+      <p class="msg" id="fd-msg" role="status"></p>
+      <div class="row">
+        <button class="btn" id="fd-check" type="button">Check</button>
+        <button class="btn ghost" id="fd-skip" type="button">Skip</button>
+        <button class="btn" id="fd-next" type="button" hidden>Next sentence →</button>
+      </div>
+    </div>
+    <div class="fd-end" id="fd-end" hidden>
+      <span class="pill">Finished</span>
+      <h3 id="fd-end-title">Well done!</h3>
+      <p id="fd-end-text"></p>
+      <button class="btn" id="fd-again" type="button">Play again</button>
+    </div>
+  </div>
+
+  <!-- Question cards -->
+  <div id="cards" class="panel" hidden>
+    <div class="panel-head">
+      <div><h2>Question Cards</h2><p>Flip the card to see the question. Try to answer out loud or in your notebook. If you need help, ask for a hint. Then compare with the suggested answer.</p></div>
+    </div>
+    <div class="deck">
+      <div class="card" id="qc-card" tabindex="0" role="button" aria-label="Flip the card to see the question">
+        <div class="card-inner">
+          <div class="face cover">
+            <span class="cover-icon" id="qc-icon"></span>
+            <span class="pill" id="qc-cat">Speak</span>
+            <span class="flip-hint">Tap to see the question</span>
+          </div>
+          <div class="face qface">
+            <span class="pill" id="qc-tag">Speak</span>
+            <p class="q" id="qc-q"></p>
+            <span></span>
+          </div>
+        </div>
+      </div>
+      <div class="row center">
+        <button class="btn ghost" id="qc-hint" type="button" disabled>Give me a hint</button>
+        <button class="btn" id="qc-show" type="button" disabled>Show suggested answer</button>
+      </div>
+      <div class="help hint" id="qc-hint-box" hidden></div>
+      <div class="help answer" id="qc-answer-box" hidden>
+        <h3>Suggested answer</h3>
+        <p class="sugg" id="qc-a"></p>
+        <p class="note">This is only one possible answer. Yours can be different if it follows the same pattern.</p>
+      </div>
+      <div class="deck-nav">
+        <button class="btn ghost" id="qc-prev" type="button">← Previous</button>
+        <span id="qc-count">1 / 12</span>
+        <button class="btn ghost" id="qc-next" type="button">Next →</button>
+      </div>
+      <div class="row center"><button class="btn ghost" id="qc-shuffle" type="button">Shuffle cards</button></div>
+    </div>
+  </div>
+</section>
+
+<script>
+/* =====================================================================
+   CONFIG: paste here the URL of your Cloudflare Worker (see README.md).
+   The Gemini API key lives ONLY in the Worker, never in this file.
+   ===================================================================== */
+const API_URL = 'https://english-activity.rjvargasg12.workers.dev/';
+
+const $ = (s, el = document) => el.querySelector(s);
+const shuffle = arr => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+/* ---------- Screens ---------- */
+const GAMES = ['hangman', 'matching', 'fill', 'cards'];
+let current = null;
+function showSetup() {
+  current = null;
+  $('#setup').hidden = false; $('#home').hidden = true; $('#game').hidden = true;
+  try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+  window.scrollTo(0, 0);
+}
+function openGame(id) {
+  current = GAMES.includes(id) ? id : null;
+  $('#setup').hidden = true;
+  $('#home').hidden = !!current;
+  $('#game').hidden = !current;
+  GAMES.forEach(g => { document.getElementById(g).hidden = g !== current; });
+  try { history.replaceState(null, '', current ? '#' + current : location.pathname + location.search); } catch (e) {}
+  window.scrollTo(0, 0);
+  if (current) $('#back').focus({ preventScroll: true });
+}
+document.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => openGame(b.dataset.open)));
+$('#back').addEventListener('click', () => {
+  const from = current;
+  openGame(null);
+  const btn = document.querySelector(`[data-open="${from}"]`);
+  if (btn) btn.focus({ preventScroll: true });
+});
+/* ---------- Hangman ---------- */
+const HM_DEFAULT = [
+  { type: 'fill', s: 'I ___ like to travel to Japan next year.', w: 'WOULD', h: 'It goes before "like" to make a polite wish.' },
+  { type: 'fill', s: 'She ___ me to help her with the heavy boxes.', w: 'ASKED', h: 'Past tense of the verb we use for requests.' },
+  { type: 'fill', s: 'The doctor ___ him to rest for a week.', w: 'TOLD', h: 'Past tense of the verb we use for instructions.' },
+  { type: 'fill', s: 'Would you ___ to join us for dinner tonight?', w: 'LIKE', h: '"Would you ___ to…?" means "Do you want to…?"' },
+  { type: 'fill', s: 'I would like to ___ a table for two, please.', w: 'RESERVE', h: 'To book something before you go.' },
+  { type: 'fill', s: 'She isn’t here. Would you like to ___ a message?', w: 'LEAVE', h: 'You ___ a message on someone’s voicemail.' },
+  { type: 'guess', topic: 'Parts of a computer', s: 'The technician told me to change it because it couldn’t save my files anymore.', w: 'HARD DRIVE', h: 'Two words. It stores your documents, photos and programs.' },
+  { type: 'guess', topic: 'Parts of a computer', s: 'My teacher asked us to clean it because some of the letters were sticky.', w: 'KEYBOARD', h: 'You use it to type.' },
+  { type: 'guess', topic: 'Places in a city', s: 'I would like to borrow some books, so I’m going there after class.', w: 'LIBRARY', h: 'A quiet place full of books.' },
+  { type: 'guess', topic: 'Jobs', s: 'This person tells you to open your mouth and asks you not to eat too many sweets.', w: 'DENTIST', h: 'This person takes care of your teeth.' },
+  { type: 'guess', topic: 'Food and drinks', s: '“Would you like to try it with milk?” the waiter asked. It’s a hot drink made from beans.', w: 'COFFEE', h: 'Many people drink it in the morning to wake up.' },
+  // IT English: negative infinitives
+  { type: 'fill', s: 'Security told us ___ to share passwords.', w: 'NOT', h: 'In a negative infinitive, this word goes before "to".' },
+  { type: 'fill', s: 'The policy asks users not to ___ suspicious links.', w: 'CLICK', h: 'What you do with a mouse button on a link.' },
+  { type: 'fill', s: 'I asked the dev not to modify the master ___.', w: 'BRANCH', h: 'In Git, "main" or "master" is one of these.' },
+  { type: 'fill', s: 'I would like not to ___ any data during the migration.', w: 'LOSE', h: 'The opposite of "find" or "keep".' },
+  { type: 'fill', s: '“Please don’t restart the server now.” They asked us not to ___ the server now.', w: 'RESTART', h: 'To turn something off and on again.' },
+  { type: 'guess', topic: 'IT security', s: 'Security told everyone not to write it on paper and not to share it.', w: 'PASSWORD', h: 'A secret word you use to log in.' },
+  { type: 'guess', topic: 'Networking', s: 'I asked him not to reboot it because everyone was online.', w: 'ROUTER', h: 'The device that gives your office its internet connection.' },
+  { type: 'guess', topic: 'IT security', s: 'We would like not to use the old one anymore. It protects the network from attacks.', w: 'FIREWALL', h: 'It blocks dangerous traffic. It has the word "fire" in it.' },
+  { type: 'guess', topic: 'Hardware', s: '“Who asked you not to update it?” It is the software that lives inside a device.', w: 'FIRMWARE', h: 'Similar to "software" and "hardware".' },
+  { type: 'guess', topic: 'IT security', s: 'She told the team not to share it. Apps use this secret code to connect to a service.', w: 'API KEY', h: 'Two words. Three letters + a word for what opens a door.' },
+  { type: 'guess', topic: 'Servers', s: '“Don’t delete them!” They are the records of everything the system does.', w: 'LOGS', h: 'Short word. Developers read them to find bugs.' }
+];
+let HM = HM_DEFAULT;
+const MAX = 6;
+let hmOrder = shuffle(HM), hmI = 0, hmGuessed = new Set(), hmWrong = 0, hmDone = false, hmWon = 0, hmPlayed = 0;
+const keysEl = $('#hm-keys');
+'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(L => {
+  const b = el('button', 'key', L);
+  b.type = 'button'; b.dataset.l = L; b.setAttribute('aria-label', 'Letter ' + L);
+  b.addEventListener('click', () => hmGuess(L));
+  keysEl.appendChild(b);
+});
+const hmLetters = w => w.replace(/ /g, '').split('');
+function hmRender() {
+  const it = hmOrder[hmI];
+  $('#hm-count').textContent = `Word ${hmI + 1} of ${hmOrder.length}`;
+  const mode = $('#hm-mode');
+  mode.textContent = it.type === 'fill' ? 'Fill the gap' : 'Guess the word';
+  mode.classList.toggle('alt', it.type !== 'fill');
+  const topic = $('#hm-topic'), sent = $('#hm-sentence');
+  sent.textContent = '';
+  if (it.type === 'fill') {
+    topic.hidden = true;
+    const [a, b] = it.s.split('___');
+    const gap = el('mark');
+    let word = it.w.toLowerCase();
+    if (a === '') word = cap(word);
+    gap.textContent = hmDone ? word : '_____';
+    sent.append(a, gap, b);
+  } else {
+    topic.hidden = false;
+    topic.textContent = '';
+    topic.append(el('span', null, 'Topic: '), it.topic);
+    sent.textContent = 'Clue: ' + it.s;
+  }
+  const wordEl = $('#hm-word');
+  wordEl.textContent = '';
+  wordEl.setAttribute('aria-label', 'Word: ' + it.w.split('').map(c => c === ' ' ? 'space' : hmGuessed.has(c) ? c : 'blank').join(' '));
+  it.w.split('').forEach(c => {
+    if (c === ' ') { wordEl.appendChild(el('span', 'tile space')); return; }
+    const t = el('span', 'tile');
+    if (hmGuessed.has(c)) t.textContent = c;
+    else if (hmDone) { t.textContent = c; t.classList.add('missed'); }
+    wordEl.appendChild(t);
+  });
+  keysEl.querySelectorAll('.key').forEach(k => {
+    const L = k.dataset.l, used = hmGuessed.has(L);
+    k.classList.toggle('hit', used && it.w.includes(L));
+    k.classList.toggle('miss', used && !it.w.includes(L));
+    k.disabled = used || hmDone;
+  });
+  document.querySelectorAll('.hm-fig .part').forEach((p, i) => p.classList.toggle('on', i < hmWrong));
+  const left = MAX - hmWrong;
+  $('#hm-lives').textContent = `${left} ${left === 1 ? 'life' : 'lives'} left`;
+  $('#hm-score').textContent = `Won ${hmWon} of ${hmPlayed}`;
+  $('#hm-next').textContent = hmDone ? 'Next word' : 'Skip word';
+}
+function hmGuess(L) {
+  if (hmDone || hmGuessed.has(L)) return;
+  const it = hmOrder[hmI];
+  hmGuessed.add(L);
+  if (!it.w.includes(L)) hmWrong++;
+  const msg = $('#hm-msg');
+  if (hmLetters(it.w).every(c => hmGuessed.has(c))) {
+    hmDone = true; hmWon++; hmPlayed++;
+    msg.className = 'msg ok';
+    msg.textContent = it.type === 'fill' ? 'Correct! Read the full sentence out loud.' : 'Correct! Now say the clue out loud.';
+  } else if (hmWrong >= MAX) {
+    hmDone = true; hmPlayed++;
+    msg.className = 'msg no'; msg.textContent = `Out of lives. The answer was "${it.w.toLowerCase()}".`;
+  }
+  hmRender();
+}
+function hmNext() {
+  hmI++;
+  if (hmI >= hmOrder.length) { hmOrder = shuffle(HM); hmI = 0; }
+  hmGuessed = new Set(); hmWrong = 0; hmDone = false;
+  $('#hm-msg').textContent = ''; $('#hm-msg').className = 'msg';
+  $('#hm-hint-text').hidden = true;
+  hmRender();
+}
+$('#hm-next').addEventListener('click', hmNext);
+function hmReset() {
+  hmOrder = shuffle(HM); hmI = 0; hmGuessed = new Set(); hmWrong = 0; hmDone = false; hmWon = 0; hmPlayed = 0;
+  $('#hm-msg').textContent = ''; $('#hm-msg').className = 'msg';
+  $('#hm-hint-text').hidden = true;
+  hmRender();
+}
+$('#hm-hint').addEventListener('click', () => {
+  const h = $('#hm-hint-text'); h.textContent = 'Hint: ' + hmOrder[hmI].h; h.hidden = false;
+});
+document.addEventListener('keydown', e => {
+  if (current !== 'hangman' || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+  if (/^[a-z]$/i.test(e.key)) hmGuess(e.key.toUpperCase());
+});
+hmRender();
+
+/* ---------- Matching ---------- */
+const MT_EVERYDAY = [
+  { l: '“Please, can you help me with my bag?” Maria said to me.', r: 'Maria asked me to help her with her bag.' },
+  { l: '“Don’t touch the oven!” Mom said to the kids.', r: 'Mom told the kids not to touch the oven.' },
+  { l: '“Sit down and open your books,” the teacher said to us.', r: 'The teacher told us to sit down and open our books.' },
+  { l: '“Could you call me later, please?” Tom said to Lisa.', r: 'Tom asked Lisa to call him later.' },
+  { l: '“I want a cup of tea.” (said politely)', r: 'I would like to have a cup of tea.' },
+  { l: '“Do you want to dance?” (said politely)', r: 'Would you like to dance?' },
+  { l: '“Don’t be late again!” the boss said to Peter.', r: 'The boss told Peter not to be late again.' },
+  { l: '“Please don’t make noise,” the librarian said to the students.', r: 'The librarian asked the students not to make noise.' }
+];
+const MT_IT = [
+  { l: '“Don’t delete the logs!” I said to him.', r: 'I told him not to delete the logs.' },
+  { l: '“Please don’t use public Wi-Fi,” the admin said to me.', r: 'The admin asked me not to use public Wi-Fi.' },
+  { l: '“Don’t share the API key!” she said to the team.', r: 'She told the team not to share the API key.' },
+  { l: '“Please don’t restart the server now,” they said to us.', r: 'They asked us not to restart the server now.' },
+  { l: '“Don’t install unauthorized apps!” HR said to the staff.', r: 'HR told the staff not to install unauthorized apps.' },
+  { l: '“I don’t want to lose any data during the migration.” (said politely)', r: 'I would like not to lose any data during the migration.' },
+  { l: '“Please don’t modify the master branch,” I said to the dev.', r: 'I asked the dev not to modify the master branch.' },
+  { l: '“Don’t open the script!” we said to the client.', r: 'We told the client not to open the script.' }
+];
+let MT_CUSTOM = null;
+let MT = MT_EVERYDAY;
+let selL = null, selR = null, mtMatched = 0, mtMistakes = 0;
+function mtBuild() {
+  selL = selR = null; mtMatched = 0; mtMistakes = 0;
+  $('#mt-msg').textContent = '';
+  const L = $('#mt-left'), R = $('#mt-right');
+  L.textContent = ''; R.textContent = '';
+  const mk = (i, side, text) => {
+    const b = el('button', 'mcard', text);
+    b.type = 'button'; b.dataset.k = i; b.dataset.side = side;
+    b.addEventListener('click', () => mtPick(b));
+    return b;
+  };
+  shuffle(MT.map((p, i) => i)).forEach(i => L.appendChild(mk(i, 'l', MT[i].l)));
+  shuffle(MT.map((p, i) => i)).forEach(i => R.appendChild(mk(i, 'r', MT[i].r)));
+  mtScore();
+}
+function mtScore() {
+  $('#mt-score').textContent = `${mtMatched} of ${MT.length} matched · ${mtMistakes} ${mtMistakes === 1 ? 'mistake' : 'mistakes'}`;
+}
+function mtPick(b) {
+  if (b.classList.contains('done')) return;
+  const isL = b.dataset.side === 'l';
+  const cur = isL ? selL : selR;
+  if (cur === b) { b.classList.remove('sel'); if (isL) selL = null; else selR = null; return; }
+  if (cur) cur.classList.remove('sel');
+  b.classList.add('sel');
+  if (isL) selL = b; else selR = b;
+  if (!selL || !selR) return;
+  const a = selL, c = selR;
+  selL = selR = null;
+  a.classList.remove('sel'); c.classList.remove('sel');
+  if (a.dataset.k === c.dataset.k) {
+    mtMatched++;
+    [a, c].forEach(x => { x.classList.add('done'); x.setAttribute('aria-disabled', 'true'); x.appendChild(el('span', 'pair', 'Pair ' + mtMatched)); });
+    if (mtMatched === MT.length) $('#mt-msg').textContent = mtMistakes === 0 ? 'Perfect! All pairs matched with no mistakes.' : `Well done! All pairs matched with ${mtMistakes} ${mtMistakes === 1 ? 'mistake' : 'mistakes'}.`;
+  } else {
+    mtMistakes++;
+    [a, c].forEach(x => { x.classList.remove('wrong'); void x.offsetWidth; x.classList.add('wrong'); setTimeout(() => x.classList.remove('wrong'), 700); });
+  }
+  mtScore();
+}
+$('#mt-reset').addEventListener('click', mtBuild);
+function mtUseSet(set) {
+  document.querySelectorAll('.seg-btn').forEach(x => x.setAttribute('aria-pressed', x.dataset.set === set));
+  MT = set === 'it' ? MT_IT : set === 'custom' && MT_CUSTOM ? MT_CUSTOM : MT_EVERYDAY;
+  mtBuild();
+}
+document.querySelectorAll('.seg-btn').forEach(b => b.addEventListener('click', () => mtUseSet(b.dataset.set)));
+mtBuild();
+
+/* ---------- Fill & drag ---------- */
+// a: one array of accepted answers per gap (lowercase)
+const FD_DEFAULT = [
+  { mode: 'drag', pre: '', t: 'I ___ ___ to book a hotel room for two nights.', a: [['would'], ['like']] },
+  { mode: 'drag', pre: '“Turn off your phones!” the teacher said.', t: 'The teacher ___ the students ___ turn off their phones.', a: [['told'], ['to']] },
+  { mode: 'drag', pre: '“Can you open the window, please?” Ana said to me.', t: 'Ana ___ ___ to open the window.', a: [['asked'], ['me']] },
+  { mode: 'drag', pre: '“Don’t run in the hall!” the principal said to us.', t: 'The principal told us ___ ___ run in the hall.', a: [['not'], ['to']] },
+  { mode: 'drag', pre: 'A waiter offers you something to drink.', t: '___ you ___ a glass of water?', a: [['would'], ['like']] },
+  { mode: 'drag', pre: 'Her dream is to live in Rome one day.', t: 'My sister would like ___ ___ Italian next year.', a: [['to'], ['learn']] },
+  { mode: 'type', pre: '“Please wait here,” the nurse said to me.', t: 'The nurse ___ me ___ wait here.', a: [['asked'], ['to']] },
+  { mode: 'type', pre: '“Don’t touch that!” Dad said to the kids.', t: 'Dad told the kids ___ ___ touch that.', a: [['not'], ['to']] },
+  { mode: 'type', pre: 'You are inviting a friend to dinner.', t: 'What ___ you ___ to eat tonight?', a: [['would'], ['like']] },
+  { mode: 'type', pre: '“Call me later!” Tom said to Lisa.', t: 'Tom ___ Lisa ___ call him later.', a: [['told'], ['to']] },
+  { mode: 'type', pre: '“Can you finish the report by Friday?” my boss said to me.', t: 'My boss asked ___ ___ finish the report by Friday.', a: [['me'], ['to']] },
+  // IT English: negative infinitives (drag)
+  { mode: 'drag', pre: '“Please don’t reboot the router.”', t: 'I asked him ___ ___ reboot the router.', a: [['not'], ['to']] },
+  { mode: 'drag', pre: 'She needs to focus on her work.', t: 'She ___ ___ not to be disturbed during the sprint.', a: [['would'], ['like']] },
+  { mode: 'drag', pre: '“Don’t share the VPN link!” they said to me.', t: 'They told me not ___ ___ the VPN link.', a: [['to'], ['share']] },
+  { mode: 'drag', pre: 'Someone said: “Don’t update the firmware.”', t: 'Who ___ you not ___ update the firmware?', a: [['asked', 'told'], ['to']] },
+  { mode: 'drag', pre: 'The budget is small this year.', t: 'I would like ___ ___ spend too much on cloud hosting.', a: [['not'], ['to']] },
+  { mode: 'drag', pre: '“Don’t waste any of the budget!” the CEO said to us.', t: 'The CEO ___ us not ___ waste any of the budget.', a: [['told'], ['to']] },
+  { mode: 'drag', pre: '“Please don’t commit code without a review,” the DevOps lead said to me.', t: 'The DevOps lead ___ me ___ to commit code without a review.', a: [['asked'], ['not']] },
+  { mode: 'drag', pre: 'You worked every weekend during the project.', t: 'Personally, I ___ ___ not to have to work on weekends ever again.', a: [['would'], ['like']] },
+  // IT English: negative infinitives (write)
+  { mode: 'type', pre: '“Don’t delete the logs.”', t: 'I told him ___ to ___ the logs.', a: [['not'], ['delete']] },
+  { mode: 'type', pre: '“Please don’t use public Wi-Fi.”', t: 'The admin asked me ___ to ___ public Wi-Fi.', a: [['not'], ['use']] },
+  { mode: 'type', pre: '“Don’t share the API key.”', t: 'She told the team ___ to ___ the API key.', a: [['not'], ['share']] },
+  { mode: 'type', pre: '“Please don’t restart the server now.”', t: 'They asked us not ___ ___ the server now.', a: [['to'], ['restart']] },
+  { mode: 'type', pre: '“Don’t install unauthorized apps!”', t: 'HR ___ the staff not ___ install unauthorized apps.', a: [['told'], ['to']] },
+  { mode: 'type', pre: 'Security policy. Use: told or asked + (not / store)', t: 'The CTO ___ us ___ data in plain text.', a: [['told', 'asked'], ['not to store']] },
+  { mode: 'type', pre: 'Security policy. Use: would like + (not / see)', t: 'I ___ ___ another system crash today.', a: [['would like', "'d like"], ['not to see']] },
+  { mode: 'type', pre: 'Security policy. Use: told or asked + (not / write)', t: 'Security ___ everyone ___ passwords on paper.', a: [['told', 'asked'], ['not to write']] },
+  { mode: 'type', pre: 'Security policy. Use: would like + (not / use)', t: 'We ___ ___ the old firewall anymore.', a: [['would like', "'d like"], ['not to use']] },
+  { mode: 'type', pre: 'Security policy. Use: told or asked + (not / deploy)', t: 'The Lead ___ me ___ on a Friday.', a: [['told', 'asked'], ['not to deploy']] }
+];
+// Extra words that sit in the bank but fit no gap
+const FD_DISTRACT_DEFAULT = ['tell', 'ask', 'him', 'learning', 'sharing', 'no', 'don’t', 'them'];
+const FD_ROUND = { drag: 6, type: 5 };
+let FD = FD_DEFAULT, FD_DISTRACT = FD_DISTRACT_DEFAULT;
+let fdOrder, fdI, fdOk, fdSkip, fdChecked, fdBankOrder, fdTarget = null;
+const norm = v => v.trim().toLowerCase().replace(/’/g, "'").replace(/\s+/g, ' ');
+function fdScore() { $('#fd-score').textContent = `${fdOk} correct · ${fdSkip} skipped`; }
+function fdStart() {
+  const drags = shuffle(FD.filter(x => x.mode === 'drag')).slice(0, FD_ROUND.drag);
+  const types = shuffle(FD.filter(x => x.mode === 'type')).slice(0, FD_ROUND.type);
+  fdOrder = shuffle(drags.concat(types)); fdI = 0; fdOk = 0; fdSkip = 0;
+  const words = new Set();
+  drags.forEach(it => it.a.forEach(acc => acc.forEach(w => words.add(w))));
+  shuffle(FD_DISTRACT).forEach(w => { if (words.size < 14) words.add(w); });
+  fdBankOrder = shuffle([...words]);
+  $('#fd-end').hidden = true; $('#fd-stage').hidden = false;
+  fdRender();
+}
+function fdGaps() { return [...$('#fd-sent').querySelectorAll('.blank, .blank-in')]; }
+function fdSetTarget(b) {
+  if (fdTarget) fdTarget.classList.remove('target');
+  fdTarget = b;
+  if (b) b.classList.add('target');
+}
+function fdFill(blank, word) {
+  if (fdChecked) return;
+  blank.dataset.word = word; blank.textContent = word; blank.classList.add('filled');
+  blank.setAttribute('aria-label', 'Gap with ' + word + '. Press to remove.');
+  fdSetTarget(null);
+  $('#fd-msg').textContent = '';
+}
+function fdClear(blank) {
+  delete blank.dataset.word; blank.textContent = ''; blank.classList.remove('filled');
+  blank.setAttribute('aria-label', 'Empty gap');
+}
+function fdRender() {
+  const it = fdOrder[fdI];
+  fdChecked = false; fdTarget = null;
+  const drag = it.mode === 'drag';
+  $('#fd-count').textContent = `Sentence ${fdI + 1} of ${fdOrder.length}`;
+  const mode = $('#fd-mode');
+  mode.textContent = drag ? 'Drag the words' : 'Write the words';
+  mode.classList.toggle('alt', !drag);
+  $('#fd-how').textContent = drag
+    ? 'Drag a word into a gap, or tap a word to put it in the next empty gap. Tap a gap to empty it.'
+    : 'Type the two missing words. Press Enter to check.';
+  const pre = $('#fd-pre'); pre.textContent = it.pre; pre.hidden = !it.pre;
+  const sent = $('#fd-sent'); sent.textContent = '';
+  const parts = it.t.split('___');
+  parts.forEach((p, k) => {
+    sent.append(p);
+    if (k === parts.length - 1) return;
+    if (drag) {
+      const b = el('span', 'blank');
+      b.tabIndex = 0; b.setAttribute('role', 'button'); b.setAttribute('aria-label', 'Empty gap');
+      b.addEventListener('click', () => { if (fdChecked) return; if (b.dataset.word) fdClear(b); else fdSetTarget(fdTarget === b ? null : b); });
+      b.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); b.click(); } });
+      b.addEventListener('dragover', e => { if (!fdChecked) { e.preventDefault(); b.classList.add('over'); } });
+      b.addEventListener('dragleave', () => b.classList.remove('over'));
+      b.addEventListener('drop', e => { e.preventDefault(); b.classList.remove('over'); const w = e.dataTransfer.getData('text/plain'); if (w) fdFill(b, w); });
+      sent.appendChild(b);
+    } else {
+      const inp = el('input', 'blank-in');
+      inp.type = 'text'; inp.id = 'fd-in-' + k; inp.autocomplete = 'off'; inp.spellcheck = false;
+      inp.setAttribute('autocapitalize', 'off'); inp.setAttribute('aria-label', 'Missing word ' + (k + 1));
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); fdChecked ? fdNext() : fdCheck(); } });
+      sent.appendChild(inp);
+    }
+  });
+  const bank = $('#fd-bank');
+  bank.hidden = !drag; bank.classList.remove('locked'); bank.textContent = '';
+  if (drag) {
+    fdBankOrder.forEach(w => {
+      const c = el('button', 'chip', w);
+      c.type = 'button'; c.draggable = true;
+      c.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', w); e.dataTransfer.effectAllowed = 'copy'; });
+      c.addEventListener('click', () => {
+        const target = fdTarget || fdGaps().find(g => !g.dataset.word);
+        if (target) fdFill(target, w);
+        else { const m = $('#fd-msg'); m.className = 'msg no'; m.textContent = 'Both gaps are full. Tap a gap to empty it first.'; }
+      });
+      bank.appendChild(c);
+    });
+  }
+  $('#fd-msg').textContent = ''; $('#fd-msg').className = 'msg';
+  $('#fd-check').hidden = false; $('#fd-skip').hidden = false; $('#fd-next').hidden = true;
+  fdScore();
+  if (!drag) setTimeout(() => { const f = $('#fd-in-0'); if (f) f.focus({ preventScroll: true }); }, 0);
+}
+function fdCheck() {
+  if (fdChecked) return;
+  const it = fdOrder[fdI];
+  const gaps = fdGaps();
+  const vals = gaps.map(g => it.mode === 'drag' ? (g.dataset.word || '') : g.value);
+  const m = $('#fd-msg');
+  if (vals.some(v => !v.trim())) { m.className = 'msg no'; m.textContent = 'Complete both gaps first.'; return; }
+  fdChecked = true;
+  fdSetTarget(null);
+  const res = vals.map((v, k) => it.a[k].includes(norm(v)));
+  gaps.forEach((g, k) => { g.classList.add(res[k] ? 'ok' : 'no'); if (g.tagName === 'INPUT') g.readOnly = true; });
+  $('#fd-bank').classList.add('locked');
+  m.textContent = '';
+  if (res.every(Boolean)) {
+    fdOk++;
+    m.className = 'msg ok'; m.textContent = 'Correct! Both words are right.';
+  } else {
+    m.className = 'msg no';
+    m.append('Not quite. The correct sentence is: ');
+    const sol = el('span', 'solution');
+    const parts = it.t.split('___');
+    parts.forEach((p, k) => {
+      sol.append(p);
+      if (k < parts.length - 1) { let w = it.a[k][0]; if (k === 0 && p === '') w = cap(w); sol.appendChild(el('strong', null, w)); }
+    });
+    m.appendChild(sol);
+  }
+  $('#fd-check').hidden = true; $('#fd-skip').hidden = true; $('#fd-next').hidden = false;
+  $('#fd-next').focus({ preventScroll: true });
+  fdScore();
+}
+function fdNext() {
+  fdI++;
+  if (fdI >= fdOrder.length) {
+    $('#fd-stage').hidden = true; $('#fd-end').hidden = false;
+    $('#fd-end-title').textContent = fdOk === fdOrder.length ? 'Perfect score!' : 'You finished!';
+    $('#fd-end-text').textContent = `You got ${fdOk} of ${fdOrder.length} sentences right and skipped ${fdSkip}.`;
+    return;
+  }
+  fdRender();
+}
+$('#fd-check').addEventListener('click', fdCheck);
+$('#fd-next').addEventListener('click', fdNext);
+$('#fd-skip').addEventListener('click', () => { fdSkip++; fdNext(); });
+$('#fd-again').addEventListener('click', fdStart);
+fdStart();
+
+/* ---------- Question cards ---------- */
+const ICONS = {
+  'Speak': '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M8 12 H56 V42 H30 L18 52 V42 H8 Z"/><path d="M18 24 H46 M18 32 H38"/></svg>',
+  'Be polite': '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M12 26 H44 V40 a12 12 0 0 1 -12 12 H24 a12 12 0 0 1 -12 -12 Z"/><path d="M44 30 H48 a6 6 0 0 1 0 12 H44"/><path d="M22 8 c-3 4 3 7 0 12 M32 8 c-3 4 3 7 0 12"/></svg>',
+  'Report it': '<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="20" cy="22" r="10"/><path d="M8 54 c0 -10 6 -16 12 -16 s12 6 12 16"/><path d="M38 14 H58 V30 H48 L42 36 V30 H38 Z"/></svg>',
+  'Fix the mistake': '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M42 8 L56 22 L26 52 H12 V38 Z"/><path d="M36 14 L50 28"/><path d="M8 58 H56"/></svg>',
+  'Spot the bug': '<svg viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="32" cy="36" rx="12" ry="16"/><circle cx="32" cy="16" r="6"/><path d="M32 22 V52 M20 30 L8 24 M20 38 H8 M20 46 L8 52 M44 30 L56 24 M44 38 H56 M44 46 L56 52 M28 11 L24 6 M36 11 L40 6"/></svg>',
+  'Post-mortem': '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6 L54 14 V30 c0 14 -10 24 -22 28 C20 54 10 44 10 30 V14 Z"/><path d="M24 24 L40 40 M40 24 L24 40"/></svg>'
+};
+const QC_DEFAULT = [
+  { tag: 'Speak', q: 'Where would you like to travel next year? Why?',
+    hint: { f: 'I would like + to + verb + place + because…', sl: 'Start like this', s: 'I would like to travel to ___ because I want to ___.', w: ['visit', 'see', 'try the food', 'relax', 'meet new people'] },
+    a: 'I would like to travel to Peru because I want to see Machu Picchu.' },
+  { tag: 'Speak', q: 'What would you like to learn this year?',
+    hint: { f: 'I would like + to learn + (how) to + verb', sl: 'Start like this', s: 'This year, I would like to learn to ___.', w: ['cook', 'swim', 'drive', 'play the guitar', 'speak French'] },
+    a: 'This year I would like to learn to play the guitar.' },
+  { tag: 'Speak', q: 'What did your parents often tell you to do when you were a child?',
+    hint: { f: 'They told me + (not) to + verb', sl: 'Start like this', s: 'My parents often told me to ___ and not to ___.', w: ['do my homework', 'go to bed early', 'eat my vegetables', 'talk to strangers'] },
+    a: 'My parents often told me to do my homework and not to talk to strangers.' },
+  { tag: 'Speak', q: 'What is something a teacher once asked you to do?',
+    hint: { f: 'My teacher asked me + to + verb', sl: 'Start like this', s: 'Once, my teacher asked me to ___.', w: ['read aloud', 'help a classmate', 'clean the board', 'give a presentation'] },
+    a: 'Once, my teacher asked me to read my essay in front of the class.' },
+  { tag: 'Be polite', q: 'A visitor arrives at your office. Offer them something to drink.',
+    hint: { f: 'Would you like + thing?   or   Would you like + to + verb?', sl: 'Start like this', s: 'Would you like ___?', w: ['a coffee', 'some water', 'a cup of tea', 'to sit down'] },
+    a: 'Would you like a coffee? Or would you like some water?' },
+  { tag: 'Be polite', q: 'You are in a restaurant. Order your food politely.',
+    hint: { f: 'I would like + (to order / to have) + food + please', sl: 'Start like this', s: 'I would like to order ___, please.', w: ['the chicken', 'a salad', 'the soup of the day', 'a lemonade'] },
+    a: 'I would like to order the grilled fish and a lemonade, please.' },
+  { tag: 'Report it', q: 'Your boss said: “Send me the report today.” Report it with tell.',
+    hint: { f: 'tell + person + to + verb', sl: 'Tip', s: 'Remove the quotation marks. "Send" becomes "to send". The person ("me") goes right after told.', w: ['My boss told me…'] },
+    a: 'My boss told me to send the report today.' },
+  { tag: 'Report it', q: 'Your friend said: “Please don’t tell anyone.” Report it with ask.',
+    hint: { f: 'ask + person + not to + verb', sl: 'Tip', s: '"Please" tells you it is a request, so use asked. "Don’t tell" becomes "not to tell".', w: ['My friend asked me…'] },
+    a: 'My friend asked me not to tell anyone.' },
+  { tag: 'Report it', q: 'The doctor said to your dad: “Don’t eat too much salt.”',
+    hint: { f: 'tell + person + not to + verb', sl: 'Tip', s: 'It is an instruction from a doctor, so use told. The person is "my dad".', w: ['The doctor told my dad…'] },
+    a: 'The doctor told my dad not to eat too much salt.' },
+  { tag: 'Fix the mistake', q: 'Find and fix the mistake: “She told me don’t worry.”',
+    hint: { f: 'tell + person + not to + verb', sl: 'Tip', s: 'Look at the word after "me". We never use "don’t" after tell + person.', w: [] },
+    a: '“She told me not to worry.”' },
+  { tag: 'Fix the mistake', q: 'Find and fix the mistake: “I would like go home now.”',
+    hint: { f: 'would like + to + verb', sl: 'Tip', s: 'One small word is missing between "like" and "go".', w: [] },
+    a: '“I would like to go home now.”' },
+  { tag: 'Fix the mistake', q: 'Find and fix the mistake: “He asked to me to wait outside.”',
+    hint: { f: 'ask + person + to + verb', sl: 'Tip', s: 'There is one extra word. The person comes right after "asked".', w: [] },
+    a: '“He asked me to wait outside.”' },
+  // IT English: Spot the bug
+  { tag: 'Spot the bug', q: 'Find and fix the bug: “The Lead told me to no touch the production server.”',
+    hint: { f: 'tell + person + not + to + verb', sl: 'Tip', s: 'Two things are wrong in "to no": the word "no" and the order. Remember: NOT goes before TO.', w: [] },
+    a: '“The Lead told me not to touch the production server.”' },
+  { tag: 'Spot the bug', q: 'Find and fix the bug: “We would like to not use this software anymore.”',
+    hint: { f: 'would like + not + to + verb', sl: 'Tip', s: 'The words are right, but two of them are in the wrong order.', w: [] },
+    a: '“We would like not to use this software anymore.”' },
+  { tag: 'Spot the bug', q: 'Find and fix the bug: “I asked them don’t to send the newsletter yet.”',
+    hint: { f: 'ask + person + not + to + verb', sl: 'Tip', s: '"Don’t" is for direct orders. In a reported sentence, change it to another short word.', w: [] },
+    a: '“I asked them not to send the newsletter yet.”' },
+  { tag: 'Spot the bug', q: 'Find and fix the bug: “He told the user no to click the link.”',
+    hint: { f: 'tell + person + not + to + verb', sl: 'Tip', s: 'Only one word is wrong. "No" is never used before an infinitive.', w: [] },
+    a: '“He told the user not to click the link.”' },
+  { tag: 'Spot the bug', q: 'Find and fix the bug: “Would you like no to join the meeting?”',
+    hint: { f: 'Would you like + (not) + to + verb?', sl: 'Tip', s: 'Change "no" to the correct negative word. Then think: is this question an invitation? Maybe you don’t need a negative at all.', w: [] },
+    a: '“Would you like not to join the meeting?” As an invitation, the natural question is “Would you like to join the meeting?”' },
+  // IT English: Speaking task
+  { tag: 'Post-mortem', q: 'Your company had a major data leak. What did the admin tell everyone not to do after the incident?',
+    hint: { f: 'The admin told us + not to + verb', sl: 'Start like this', s: 'The admin told us not to ___ and not to ___.', w: ['share passwords', 'connect USB drives', 'click links', 'open attachments', 'delete logs', 'use public Wi-Fi'] },
+    a: 'The admin told us not to share our passwords and not to connect USB drives to our laptops.' },
+  { tag: 'Post-mortem', q: 'After the data leak, what did the managers ask the team not to do?',
+    hint: { f: 'They asked us + not to + verb', sl: 'Start like this', s: 'They asked us not to ___.', w: ['talk to the press', 'open attachments', 'click unknown links', 'delete the logs', 'post about it online'] },
+    a: 'They asked us not to talk to the press and not to open attachments from unknown people.' },
+  { tag: 'Post-mortem', q: 'What would you like not to repeat after this incident? Why?',
+    hint: { f: 'I would like + not to + verb + because…', sl: 'Start like this', s: 'I would like not to ___ because ___.', w: ['repeat this mistake', 'lose any data', 'work all weekend', 'use weak passwords'] },
+    a: 'I would like not to repeat this mistake because we lost a lot of important data.' }
+];
+let QC = QC_DEFAULT;
+let qcDeck = shuffle(QC), qcI = 0;
+const card = $('#qc-card');
+function qcRender() {
+  const it = qcDeck[qcI];
+  const wasFlipped = card.classList.contains('flipped');
+  card.classList.remove('flipped');
+  card.setAttribute('aria-label', 'Flip the card to see the question');
+  $('#qc-icon').innerHTML = ICONS[it.tag];
+  $('#qc-cat').textContent = it.tag;
+  $('#qc-count').textContent = `${qcI + 1} / ${qcDeck.length}`;
+  $('#qc-hint').disabled = true; $('#qc-show').disabled = true;
+  $('#qc-hint-box').hidden = true; $('#qc-answer-box').hidden = true;
+  const setBack = () => { $('#qc-tag').textContent = it.tag; $('#qc-q').textContent = it.q; };
+  if (wasFlipped) setTimeout(setBack, 280); else setBack();
+}
+function qcFlip() {
+  const f = card.classList.toggle('flipped');
+  card.setAttribute('aria-label', f ? 'Question: ' + qcDeck[qcI].q + ' Press to turn the card over.' : 'Flip the card to see the question');
+  if (f) { $('#qc-hint').disabled = false; $('#qc-show').disabled = false; }
+}
+function qcHint() {
+  const h = qcDeck[qcI].hint, box = $('#qc-hint-box');
+  box.textContent = '';
+  box.appendChild(el('h3', null, 'Hint'));
+  const f = el('p'); f.append(el('span', 'lbl', 'Formula'), el('span', 'formula-line', h.f)); box.appendChild(f);
+  const s = el('p'); s.append(el('span', 'lbl', h.sl), h.s); box.appendChild(s);
+  if (h.w.length) {
+    const w = el('div'); w.appendChild(el('span', 'lbl', 'Useful words'));
+    const list = el('div', 'words'); h.w.forEach(x => list.appendChild(el('span', null, x)));
+    w.appendChild(list); box.appendChild(w);
+  }
+  box.hidden = false;
+}
+card.addEventListener('click', qcFlip);
+card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); qcFlip(); } });
+$('#qc-hint').addEventListener('click', qcHint);
+$('#qc-show').addEventListener('click', () => { $('#qc-a').textContent = qcDeck[qcI].a; $('#qc-answer-box').hidden = false; });
+$('#qc-next').addEventListener('click', () => { qcI = (qcI + 1) % qcDeck.length; qcRender(); });
+$('#qc-prev').addEventListener('click', () => { qcI = (qcI - 1 + qcDeck.length) % qcDeck.length; qcRender(); });
+$('#qc-shuffle').addEventListener('click', () => { qcDeck = shuffle(QC); qcI = 0; qcRender(); });
+qcRender();
+
+/* =====================================================================
+   AI CONTENT: ask the Worker (which calls Gemini) and load the games
+   ===================================================================== */
+const STORE_KEY = 'infinitives-ai-content-v1';
+const MIN = { hangman: 4, matching: 4, drag: 2, type: 2, cards: 4 };
+const str = v => (typeof v === 'string' ? v : '').replace(/\s+/g, ' ').trim();
+const blanks = s => str(s).replace(/_{2,}/g, '___');
+const countGaps = s => s.split('___').length - 1;
+
+// Turns the raw AI answer into the shapes the games use. Bad items are dropped.
+function normalizeContent(raw) {
+  if (!raw || typeof raw !== 'object') throw new Error('The AI answer was empty.');
+  const hm = (Array.isArray(raw.hangman) ? raw.hangman : []).map(x => {
+    const w = str(x.answer).toUpperCase().replace(/[^A-Z ]/g, '').replace(/ +/g, ' ').trim();
+    const type = x.type === 'guess' ? 'guess' : 'fill';
+    const s = blanks(x.sentence);
+    if (w.replace(/ /g, '').length < 2 || w.length > 22) return null;
+    if (type === 'fill' && countGaps(s) !== 1) return null;
+    if (type === 'guess' && (!s || s.toUpperCase().includes(w))) return null;
+    return { type, topic: str(x.topic) || 'Vocabulary', s, w, h: str(x.hint) || 'Think about the topic.' };
+  }).filter(Boolean).slice(0, 14);
+
+  const seen = new Set();
+  const mt = (Array.isArray(raw.matching) ? raw.matching : []).map(x => ({ l: str(x.said), r: str(x.reported) }))
+    .filter(p => p.l && p.r && !seen.has(p.r) && seen.add(p.r)).slice(0, 8);
+
+  const fd = (Array.isArray(raw.fill) ? raw.fill : []).map(x => {
+    const t = blanks(x.sentence);
+    if (countGaps(t) !== 2) return null;
+    const gap = g => (Array.isArray(g) ? g : [g]).map(v => norm(str(v))).filter(Boolean);
+    const a = [gap(x.gap1), gap(x.gap2)];
+    if (!a[0].length || !a[1].length) return null;
+    let mode = x.mode === 'type' ? 'type' : 'drag';
+    if (mode === 'drag' && a.some(acc => acc.some(w => w.includes(' ')))) mode = 'type';
+    return { mode, pre: str(x.context), t, a };
+  }).filter(Boolean);
+
+  const answers = new Set(fd.flatMap(it => it.a.flat()));
+  const distract = [...new Set((Array.isArray(raw.distractors) ? raw.distractors : [])
+    .map(v => norm(str(v))).filter(w => w && !w.includes(' ') && !answers.has(w)))].slice(0, 8);
+
+  const qc = (Array.isArray(raw.cards) ? raw.cards : []).map(x => {
+    const q = str(x.question), a = str(x.answer);
+    if (!q || !a) return null;
+    return {
+      tag: ICONS[x.tag] ? x.tag : 'Speak', q, a,
+      hint: {
+        f: str(x.formula) || 'would like / ask / tell + (not) to + verb',
+        sl: x.hintLabel === 'Tip' ? 'Tip' : 'Start like this',
+        s: str(x.hint) || 'Use the formula above.',
+        w: (Array.isArray(x.words) ? x.words : []).map(str).filter(Boolean).slice(0, 6)
+      }
+    };
+  }).filter(Boolean).slice(0, 12);
+
+  const drags = fd.filter(x => x.mode === 'drag').length, types = fd.length - drags;
+  if (hm.length < MIN.hangman || mt.length < MIN.matching || drags < MIN.drag || types < MIN.type || qc.length < MIN.cards) {
+    throw new Error('The AI answer was incomplete. Please try again.');
+  }
+  return { hm, mt, fd, distract: distract.length ? distract : FD_DISTRACT_DEFAULT, qc };
+}
+
+function loadGames(c, label) {
+  HM = c ? c.hm : HM_DEFAULT;
+  MT_CUSTOM = c ? c.mt : null;
+  FD = c ? c.fd : FD_DEFAULT;
+  FD_DISTRACT = c ? c.distract : FD_DISTRACT_DEFAULT;
+  QC = c ? c.qc : QC_DEFAULT;
+  const custom = $('#seg-custom');
+  custom.hidden = !c;
+  if (c) custom.textContent = label;
+  mtUseSet(c ? 'custom' : 'everyday');
+  hmReset(); fdStart();
+  qcDeck = shuffle(QC); qcI = 0; qcRender();
+  $('#topic-kind').textContent = c ? 'AI topic' : 'Default activities';
+  $('#topic-kind').classList.toggle('alt', !!c);
+  $('#topic-name').textContent = c ? label : 'Everyday and IT English';
+}
+
+function saveContent(data) { try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch (e) {} }
+function readContent() { try { return JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch (e) { return null; } }
+function clearContent() { try { localStorage.removeItem(STORE_KEY); } catch (e) {} }
+
+async function generate(e) {
+  e.preventDefault();
+  const topic = str($('#st-topic').value);
+  const msg = $('#st-msg');
+  msg.textContent = '';
+  if (!topic) { msg.textContent = 'Write a topic first, or pick one of the ideas.'; $('#st-topic').focus(); return; }
+  if (API_URL.includes('YOUR-')) { msg.textContent = 'The page is not connected to the AI yet. Put your Worker URL in API_URL (see README.md).'; return; }
+  const body = { topic, vocab: str($('#st-vocab').value), level: $('#st-level').value, focus: $('#st-focus').value };
+  const go = $('#st-go');
+  go.disabled = true; $('#st-default').disabled = true; $('#st-loading').hidden = false;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 120000);
+  try {
+    const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: ctrl.signal });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || `The AI server answered with error ${res.status}.`);
+    const content = normalizeContent(data.content);
+    saveContent({ topic, content });
+    loadGames(content, topic);
+    openGame(null);
+  } catch (err) {
+    msg.textContent = err.name === 'AbortError'
+      ? 'The AI took too long to answer. Please try again.'
+      : (err.message && !/fetch/i.test(err.message) ? err.message : 'Could not reach the AI server. Check your internet connection and the API_URL.');
+  } finally {
+    clearTimeout(timer);
+    go.disabled = false; $('#st-default').disabled = false; $('#st-loading').hidden = true;
+  }
+}
+
+$('#setup-form').addEventListener('submit', generate);
+document.querySelectorAll('.idea').forEach(b => b.addEventListener('click', () => { $('#st-topic').value = b.textContent; $('#st-topic').focus(); }));
+$('#st-default').addEventListener('click', () => { clearContent(); loadGames(null); openGame(null); });
+$('#change-topic').addEventListener('click', showSetup);
+
+// Start: reuse the last generated topic if there is one, otherwise ask for a topic.
+(function boot() {
+  const saved = readContent();
+  let ok = false;
+  if (saved && saved.content) {
+    try { loadGames(saved.content, saved.topic || 'Your topic'); ok = true; } catch (e) { clearContent(); }
+  }
+  const hash = (location.hash || '').slice(1);
+  if (ok || GAMES.includes(hash)) openGame(hash);
+  else showSetup();
+})();
+</script>
+</body>
+</html>
