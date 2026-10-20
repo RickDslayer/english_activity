@@ -1102,7 +1102,7 @@ async function generate(e) {
     const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: ctrl.signal });
     const data = await res.json().catch(() => ({}));
     if (res.status === 404) throw new Error('The AI server was not found. Open this page from its Netlify address.');
-    if (!res.ok || data.error) throw new Error(data.error || `The AI server answered with error ${res.status}.`);
+    if (!res.ok || data.error) throw new Error((data.error || `The AI server answered with error ${res.status}.`) + (data.detail ? ` Details: ${data.detail}` : ''));
     const content = normalizeContent(data.content);
     const meta = { grammar, vocab };
     saveContent({ meta, content });

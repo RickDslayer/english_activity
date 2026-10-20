@@ -95,24 +95,37 @@ async function askGemini({ grammar, vocab, words, level }, key) {
     'Create the full set of activities now.'
   ].join('\n');
   const model = clean(env('GEMINI_MODEL'), 60) || 'gemini-3.5-flash-lite';
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+  const m = encodeURIComponent(model);
+  const endpoints = {
+    gemini: `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`,
+    vertex: `https://aiplatform.googleapis.com/v1/publishers/google/models/${m}:generateContent`
+  };
+  // Classic Gemini API keys start with "AIza". Keys that start with "AQ." can belong to Vertex AI (express mode),
+  // so for those we try Vertex AI first and fall back to the Gemini API (and the other way round).
+  const order = key.startsWith('AQ.') ? ['vertex', 'gemini'] : ['gemini', 'vertex'];
   const payload = {
     systemInstruction: { parts: [{ text: SYSTEM }] },
     contents: [{ role: 'user', parts: [{ text: prompt }] }],
     generationConfig: { temperature: 0.9, responseMimeType: 'application/json', responseSchema: SCHEMA }
   };
 
-  let res, data;
-  try {
-    res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-      body: JSON.stringify(payload)
-    });
-    data = await res.json().catch(() => null);
-  } catch {
-    return { error: 'Could not reach Gemini. Try again in a moment.' };
+  let res = null, data = null;
+  for (const name of order) {
+    try {
+      res = await fetch(endpoints[name], {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
+        body: JSON.stringify(payload)
+      });
+      data = await res.json().catch(() => null);
+    } catch { res = null; data = null; continue; }
+    if (res.ok) { console.log('Gemini answered via', name); break; }
+    const msg = data?.error?.message || '';
+    console.log('Gemini error via', name, res.status, msg);
+    const keyProblem = [400, 401, 403].includes(res.status) && /api key|credential|unauthenticated|not supported|permission/i.test(msg);
+    if (!keyProblem) break;
   }
+  if (!res) return { error: 'Could not reach Gemini. Try again in a moment.' };
   if (!res.ok) {
     const detail = data?.error?.message || '';
     console.log('Gemini error', res.status, detail);
@@ -128,7 +141,7 @@ async function askGemini({ grammar, vocab, words, level }, key) {
 export default async (request) => {
   if (request.method === 'GET') return reply({ error: 'Use POST.' }, 405);
   if (request.method !== 'POST') return reply({ error: 'Use POST.' }, 405);
-  const key = env('GEMINI_API_KEY');
+  const key = String(env('GEMINI_API_KEY')).trim().replace(/^['"]|['"]$/g, '');
   if (!key) return reply({ error: 'The AI server has no GEMINI_API_KEY yet. Add it in Netlify and deploy again.' }, 500);
 
   let body;
