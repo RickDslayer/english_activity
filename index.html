@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Would Like, Ask &amp; Tell</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%23F0A81C%27/%3E%3Ctext x=%2732%27 y=%2744%27 font-size=%2730%27 font-family=%27Arial%27 font-weight=%27bold%27 text-anchor=%27middle%27 fill=%27%231A2142%27%3Eto%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap">
@@ -218,45 +219,53 @@ h1 .to{display:inline-block;background:var(--accent);color:var(--on-accent);padd
 <!-- SETUP: choose the topic before the games -->
 <section class="setup wrap" id="setup" hidden>
   <div class="hero">
-    <p class="eyebrow">English grammar practice · Verb + to-infinitive</p>
-    <h1>Would like, ask &amp; tell <span class="to">+ to</span></h1>
-    <p class="lede">Choose a topic and the vocabulary you want to practise. The AI will build all four activities around them.</p>
+    <p class="eyebrow">English grammar practice · AI activity builder</p>
+    <h1>Pick your grammar, <span class="to">play</span></h1>
+    <p class="lede">Choose a grammar topic and a vocabulary theme. The AI will build all four games with them.</p>
   </div>
   <form class="setup-card" id="setup-form" novalidate>
     <div class="field">
-      <label for="st-topic">Topic</label>
-      <input id="st-topic" type="text" maxlength="80" autocomplete="off" placeholder="e.g. Cybersecurity at work">
-      <div class="ideas" aria-label="Topic ideas">
-        <button type="button" class="idea">Travel and hotels</button>
-        <button type="button" class="idea">Restaurants</button>
-        <button type="button" class="idea">Cybersecurity at work</button>
-        <button type="button" class="idea">Software teams</button>
-        <button type="button" class="idea">Health and the doctor</button>
-        <button type="button" class="idea">Shopping</button>
+      <label for="st-grammar">Grammar topic</label>
+      <input id="st-grammar" type="text" maxlength="80" autocomplete="off" placeholder="e.g. Present continuous">
+      <div class="ideas" data-target="st-grammar" aria-label="Grammar ideas">
+        <button type="button" class="idea">Present simple</button>
+        <button type="button" class="idea">Present continuous</button>
+        <button type="button" class="idea">Past simple</button>
+        <button type="button" class="idea">Past perfect</button>
+        <button type="button" class="idea">Modal verbs (can, must, should)</button>
+        <button type="button" class="idea">Future: will and going to</button>
+        <button type="button" class="idea">First conditional</button>
+        <button type="button" class="idea">Infinitives (would like, ask, tell)</button>
       </div>
     </div>
     <div class="field">
-      <label for="st-vocab">Vocabulary to include <span>(optional)</span></label>
-      <textarea id="st-vocab" maxlength="600" placeholder="firewall, password, backup, server, deploy"></textarea>
-      <p class="help-text">Separate the words with commas. If you leave it empty, the AI chooses useful words for the topic.</p>
+      <label for="st-vocab">Vocabulary theme</label>
+      <input id="st-vocab" type="text" maxlength="80" autocomplete="off" placeholder="e.g. Vegetables">
+      <div class="ideas" data-target="st-vocab" aria-label="Vocabulary ideas">
+        <button type="button" class="idea">Vegetables</button>
+        <button type="button" class="idea">IT and computers</button>
+        <button type="button" class="idea">Travel</button>
+        <button type="button" class="idea">Food and cooking</button>
+        <button type="button" class="idea">Sports</button>
+        <button type="button" class="idea">Health</button>
+        <button type="button" class="idea">Animals</button>
+        <button type="button" class="idea">Jobs</button>
+      </div>
     </div>
-    <div class="field-row">
-      <div class="field">
-        <label for="st-level">Level</label>
-        <select id="st-level">
-          <option value="A2">A2 · Elementary</option>
-          <option value="B1" selected>B1 · Intermediate</option>
-          <option value="B2">B2 · Upper intermediate</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="st-focus">Grammar focus</label>
-        <select id="st-focus">
-          <option value="mixed" selected>Positive and negative (to / not to)</option>
-          <option value="positive">Positive only (to)</option>
-          <option value="negative">Mostly negative (not to)</option>
-        </select>
-      </div>
+    <div class="field">
+      <label for="st-words">Specific words <span>(optional)</span></label>
+      <textarea id="st-words" maxlength="600" placeholder="carrot, lettuce, onion, pepper"></textarea>
+      <p class="help-text">Separate the words with commas. If you leave it empty, the AI chooses words for the theme.</p>
+    </div>
+    <div class="field">
+      <label for="st-level">Level</label>
+      <select id="st-level">
+        <option value="A1">A1 · Beginner</option>
+        <option value="A2">A2 · Elementary</option>
+        <option value="B1" selected>B1 · Intermediate</option>
+        <option value="B2">B2 · Upper intermediate</option>
+        <option value="C1">C1 · Advanced</option>
+      </select>
     </div>
     <div class="loading" id="st-loading" hidden><span class="spinner" aria-hidden="true"></span>Creating your activities. This usually takes 15–40 seconds.</div>
     <p class="msg no" id="st-msg" role="status"></p>
@@ -270,8 +279,8 @@ h1 .to{display:inline-block;background:var(--accent);color:var(--on-accent);padd
 <!-- HOME -->
 <section class="home wrap" id="home" hidden>
   <div class="hero">
-    <p class="eyebrow">English grammar practice · Verb + to-infinitive</p>
-    <h1>Would like, ask &amp; tell <span class="to">+ to</span></h1>
+    <p class="eyebrow" id="home-eyebrow">English grammar practice · Verb + to-infinitive</p>
+    <h1 id="home-title">Would like, ask &amp; tell <span class="to">+ to</span></h1>
     <p class="lede">Choose an activity to start practising.</p>
   </div>
   <div class="topic-bar">
@@ -294,7 +303,7 @@ h1 .to{display:inline-block;background:var(--accent);color:var(--on-accent);padd
         <rect x="40" y="8" width="20" height="14" rx="3"/><rect x="40" y="42" width="20" height="14" rx="3"/>
         <path d="M24 15 L40 49 M24 49 L40 15"/>
       </svg></span>
-      <span class="gtext"><h2>Match the Ideas</h2><p>Connect what someone said with the same idea written with an infinitive.</p><span class="go">Play →</span></span>
+      <span class="gtext"><h2>Match the Ideas</h2><p>Connect each card on the left with its partner on the right.</p><span class="go">Play →</span></span>
     </button>
     <button class="gcard" type="button" data-open="fill">
       <span class="gicon"><svg viewBox="0 0 64 64" aria-hidden="true">
@@ -321,7 +330,7 @@ h1 .to{display:inline-block;background:var(--accent);color:var(--on-accent);padd
 <section class="game wrap" id="game" hidden>
   <div class="gbar">
     <button class="btn ghost" type="button" id="back">← All activities</button>
-    <span class="eyebrow">would like · ask · tell + to</span>
+    <span class="eyebrow" id="game-eyebrow">would like · ask · tell + to</span>
   </div>
 
   <!-- Hangman -->
@@ -362,7 +371,7 @@ h1 .to{display:inline-block;background:var(--accent);color:var(--on-accent);padd
   <!-- Matching -->
   <div id="matching" class="panel" hidden>
     <div class="panel-head">
-      <div><h2>Match the Ideas</h2><p>On the left is what someone said. On the right is the same idea written with an infinitive. Tap one card on each side to make a pair.</p></div>
+      <div><h2>Match the Ideas</h2><p id="mt-desc">On the left is what someone said. On the right is the same idea written with an infinitive. Tap one card on each side to make a pair.</p></div>
       <span class="score" id="mt-score">0 of 8 matched</span>
     </div>
     <div class="seg" role="group" aria-label="Choose a set of sentences">
@@ -371,8 +380,8 @@ h1 .to{display:inline-block;background:var(--accent);color:var(--on-accent);padd
       <button type="button" class="seg-btn" data-set="custom" aria-pressed="false" id="seg-custom" hidden>Your topic</button>
     </div>
     <div class="match">
-      <div><h3 class="col-label">What they said</h3><div class="mlist" id="mt-left"></div></div>
-      <div><h3 class="col-label">The same idea, with an infinitive</h3><div class="mlist" id="mt-right"></div></div>
+      <div><h3 class="col-label" id="mt-lab-l">What they said</h3><div class="mlist" id="mt-left"></div></div>
+      <div><h3 class="col-label" id="mt-lab-r">The same idea, with an infinitive</h3><div class="mlist" id="mt-right"></div></div>
     </div>
     <p class="msg ok" id="mt-msg" role="status"></p>
     <div class="row"><button class="btn ghost" id="mt-reset" type="button">Shuffle and start again</button></div>
@@ -628,7 +637,9 @@ const MT_IT = [
   { l: '“Please don’t modify the master branch,” I said to the dev.', r: 'I asked the dev not to modify the master branch.' },
   { l: '“Don’t open the script!” we said to the client.', r: 'We told the client not to open the script.' }
 ];
-let MT_CUSTOM = null;
+let MT_CUSTOM = null, MT_LABELS = ['Start', 'Match'];
+const MT_DESC_DEFAULT = 'On the left is what someone said. On the right is the same idea written with an infinitive. Tap one card on each side to make a pair.';
+const MT_DESC_AI = 'Each card on the left has one partner on the right. Tap one card on each side to make a pair.';
 let MT = MT_EVERYDAY;
 let selL = null, selR = null, mtMatched = 0, mtMistakes = 0;
 function mtBuild() {
@@ -674,7 +685,11 @@ function mtPick(b) {
 $('#mt-reset').addEventListener('click', mtBuild);
 function mtUseSet(set) {
   document.querySelectorAll('.seg-btn').forEach(x => x.setAttribute('aria-pressed', x.dataset.set === set));
-  MT = set === 'it' ? MT_IT : set === 'custom' && MT_CUSTOM ? MT_CUSTOM : MT_EVERYDAY;
+  const custom = set === 'custom' && MT_CUSTOM;
+  MT = set === 'it' ? MT_IT : custom ? MT_CUSTOM : MT_EVERYDAY;
+  $('#mt-lab-l').textContent = custom ? MT_LABELS[0] : 'What they said';
+  $('#mt-lab-r').textContent = custom ? MT_LABELS[1] : 'The same idea, with an infinitive';
+  $('#mt-desc').textContent = custom ? MT_DESC_AI : MT_DESC_DEFAULT;
   mtBuild();
 }
 document.querySelectorAll('.seg-btn').forEach(b => b.addEventListener('click', () => mtUseSet(b.dataset.set)));
@@ -858,6 +873,8 @@ const ICONS = {
   'Report it': '<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="20" cy="22" r="10"/><path d="M8 54 c0 -10 6 -16 12 -16 s12 6 12 16"/><path d="M38 14 H58 V30 H48 L42 36 V30 H38 Z"/></svg>',
   'Fix the mistake': '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M42 8 L56 22 L26 52 H12 V38 Z"/><path d="M36 14 L50 28"/><path d="M8 58 H56"/></svg>',
   'Spot the bug': '<svg viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="32" cy="36" rx="12" ry="16"/><circle cx="32" cy="16" r="6"/><path d="M32 22 V52 M20 30 L8 24 M20 38 H8 M20 46 L8 52 M44 30 L56 24 M44 38 H56 M44 46 L56 52 M28 11 L24 6 M36 11 L40 6"/></svg>',
+  'Describe': '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M4 32 C14 16 50 16 60 32 C50 48 14 48 4 32 Z"/><circle cx="32" cy="32" r="9"/><circle class="solid" cx="32" cy="32" r="3"/></svg>',
+  'Transform it': '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M10 22 H50 M42 14 L50 22 L42 30"/><path d="M54 42 H14 M22 34 L14 42 L22 50"/></svg>',
   'Post-mortem': '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6 L54 14 V30 c0 14 -10 24 -22 28 C20 54 10 44 10 30 V14 Z"/><path d="M24 24 L40 40 M40 24 L24 40"/></svg>'
 };
 const QC_DEFAULT = [
@@ -970,8 +987,14 @@ qcRender();
 /* =====================================================================
    AI CONTENT: ask the Worker (which calls Gemini) and load the games
    ===================================================================== */
-const STORE_KEY = 'infinitives-ai-content-v1';
+const STORE_KEY = 'grammar-games-ai-content-v2';
 const MIN = { hangman: 4, matching: 4, drag: 2, type: 2, cards: 4 };
+const DEFAULT_LOOK = {
+  title: $('#home-title').innerHTML,
+  eyebrow: $('#home-eyebrow').textContent,
+  game: $('#game-eyebrow').textContent,
+  doc: document.title
+};
 const str = v => (typeof v === 'string' ? v : '').replace(/\s+/g, ' ').trim();
 const blanks = s => str(s).replace(/_{2,}/g, '___');
 const countGaps = s => s.split('___').length - 1;
@@ -990,8 +1013,10 @@ function normalizeContent(raw) {
   }).filter(Boolean).slice(0, 14);
 
   const seen = new Set();
-  const mt = (Array.isArray(raw.matching) ? raw.matching : []).map(x => ({ l: str(x.said), r: str(x.reported) }))
+  const mt = (Array.isArray(raw.matching) ? raw.matching : []).map(x => ({ l: str(x.left), r: str(x.right) }))
     .filter(p => p.l && p.r && !seen.has(p.r) && seen.add(p.r)).slice(0, 8);
+  const lab = raw.matchingLabels || {};
+  const mtLabels = [str(lab.left) || 'Start', str(lab.right) || 'Match'];
 
   const fd = (Array.isArray(raw.fill) ? raw.fill : []).map(x => {
     const t = blanks(x.sentence);
@@ -1014,7 +1039,7 @@ function normalizeContent(raw) {
     return {
       tag: ICONS[x.tag] ? x.tag : 'Speak', q, a,
       hint: {
-        f: str(x.formula) || 'would like / ask / tell + (not) to + verb',
+        f: str(x.formula) || 'Use the grammar of this topic.',
         sl: x.hintLabel === 'Tip' ? 'Tip' : 'Start like this',
         s: str(x.hint) || 'Use the formula above.',
         w: (Array.isArray(x.words) ? x.words : []).map(str).filter(Boolean).slice(0, 6)
@@ -1026,24 +1051,32 @@ function normalizeContent(raw) {
   if (hm.length < MIN.hangman || mt.length < MIN.matching || drags < MIN.drag || types < MIN.type || qc.length < MIN.cards) {
     throw new Error('The AI answer was incomplete. Please try again.');
   }
-  return { hm, mt, fd, distract: distract.length ? distract : FD_DISTRACT_DEFAULT, qc };
+  return { hm, mt, mtLabels, fd, distract: distract.length ? distract : FD_DISTRACT_DEFAULT, qc };
 }
 
-function loadGames(c, label) {
+function loadGames(c, meta) {
+  meta = meta || {};
+  const grammar = meta.grammar || 'Your grammar topic', vocab = meta.vocab || 'General vocabulary';
   HM = c ? c.hm : HM_DEFAULT;
   MT_CUSTOM = c ? c.mt : null;
+  if (c && c.mtLabels) MT_LABELS = c.mtLabels;
   FD = c ? c.fd : FD_DEFAULT;
   FD_DISTRACT = c ? c.distract : FD_DISTRACT_DEFAULT;
   QC = c ? c.qc : QC_DEFAULT;
   const custom = $('#seg-custom');
   custom.hidden = !c;
-  if (c) custom.textContent = label;
+  if (c) custom.textContent = vocab;
   mtUseSet(c ? 'custom' : 'everyday');
   hmReset(); fdStart();
   qcDeck = shuffle(QC); qcI = 0; qcRender();
-  $('#topic-kind').textContent = c ? 'AI topic' : 'Default activities';
+  const title = $('#home-title');
+  if (c) title.textContent = grammar; else title.innerHTML = DEFAULT_LOOK.title;
+  $('#home-eyebrow').textContent = c ? 'English grammar practice · ' + vocab : DEFAULT_LOOK.eyebrow;
+  $('#game-eyebrow').textContent = c ? grammar + ' · ' + vocab : DEFAULT_LOOK.game;
+  $('#topic-kind').textContent = c ? 'AI activities' : 'Default activities';
   $('#topic-kind').classList.toggle('alt', !!c);
-  $('#topic-name').textContent = c ? label : 'Everyday and IT English';
+  $('#topic-name').textContent = c ? `Grammar: ${grammar} · Vocabulary: ${vocab}` : 'Everyday and IT English';
+  document.title = c ? `${grammar} · ${vocab}` : DEFAULT_LOOK.doc;
 }
 
 function saveContent(data) { try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch (e) {} }
@@ -1052,12 +1085,13 @@ function clearContent() { try { localStorage.removeItem(STORE_KEY); } catch (e) 
 
 async function generate(e) {
   e.preventDefault();
-  const topic = str($('#st-topic').value);
+  const grammar = str($('#st-grammar').value), vocab = str($('#st-vocab').value);
   const msg = $('#st-msg');
   msg.textContent = '';
-  if (!topic) { msg.textContent = 'Write a topic first, or pick one of the ideas.'; $('#st-topic').focus(); return; }
+  if (!grammar) { msg.textContent = 'Write a grammar topic first, or pick one of the ideas.'; $('#st-grammar').focus(); return; }
+  if (!vocab) { msg.textContent = 'Write a vocabulary theme, or pick one of the ideas.'; $('#st-vocab').focus(); return; }
   if (API_URL.includes('YOUR-')) { msg.textContent = 'The page is not connected to the AI yet. Put your Worker URL in API_URL (see README.md).'; return; }
-  const body = { topic, vocab: str($('#st-vocab').value), level: $('#st-level').value, focus: $('#st-focus').value };
+  const body = { grammar, vocab, words: str($('#st-words').value), level: $('#st-level').value };
   const go = $('#st-go');
   go.disabled = true; $('#st-default').disabled = true; $('#st-loading').hidden = false;
   const ctrl = new AbortController();
@@ -1067,8 +1101,9 @@ async function generate(e) {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || `The AI server answered with error ${res.status}.`);
     const content = normalizeContent(data.content);
-    saveContent({ topic, content });
-    loadGames(content, topic);
+    const meta = { grammar, vocab };
+    saveContent({ meta, content });
+    loadGames(content, meta);
     openGame(null);
   } catch (err) {
     msg.textContent = err.name === 'AbortError'
@@ -1081,16 +1116,23 @@ async function generate(e) {
 }
 
 $('#setup-form').addEventListener('submit', generate);
-document.querySelectorAll('.idea').forEach(b => b.addEventListener('click', () => { $('#st-topic').value = b.textContent; $('#st-topic').focus(); }));
+document.querySelectorAll('.idea').forEach(b => b.addEventListener('click', () => {
+  const input = document.getElementById(b.closest('.ideas').dataset.target);
+  input.value = b.textContent; input.focus();
+}));
 $('#st-default').addEventListener('click', () => { clearContent(); loadGames(null); openGame(null); });
 $('#change-topic').addEventListener('click', showSetup);
 
-// Start: reuse the last generated topic if there is one, otherwise ask for a topic.
+// Start: reuse the last generated set if there is one, otherwise show the setup screen.
 (function boot() {
   const saved = readContent();
   let ok = false;
   if (saved && saved.content) {
-    try { loadGames(saved.content, saved.topic || 'Your topic'); ok = true; } catch (e) { clearContent(); }
+    try {
+      loadGames(saved.content, saved.meta);
+      if (saved.meta) { $('#st-grammar').value = saved.meta.grammar || ''; $('#st-vocab').value = saved.meta.vocab || ''; }
+      ok = true;
+    } catch (e) { clearContent(); }
   }
   const hash = (location.hash || '').slice(1);
   if (ok || GAMES.includes(hash)) openGame(hash);

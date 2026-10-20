@@ -1,6 +1,6 @@
 # Would like, ask & tell + to
 
-Página de práctica de inglés con 4 juegos: **Hangman**, **Match the Ideas**, **Fill & Drag** y **Question Cards**. Trabaja *would like / ask / tell + (not) to + verb*. Una pantalla inicial permite elegir el tema y el vocabulario, y la IA (Gemini) genera los ejercicios.
+Página de práctica de inglés con 4 juegos: **Hangman**, **Match the Ideas**, **Fill & Drag** y **Question Cards**. Trabaja *would like / ask / tell + (not) to + verb*. Una pantalla inicial permite elegir el tema gramatical (presente continuo, pasado perfecto, modales…) y el tema de vocabulario (vegetales, IT…), y la IA (Gemini) genera los ejercicios. Las actividades por defecto practican *would like / ask / tell + (not) to*.
 
 - **Página (GitHub Pages):** https://rickdslayer.github.io/english_activity/
 - **Servidor de IA:** Cloudflare Worker, en la carpeta `worker/`
